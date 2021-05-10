@@ -35,10 +35,13 @@
     # note that this currently assumes that surface and 10cm temps are the same
 
 
+  # wait for this to finish before proceeding
+  
 # step 2: remove dates when sensors not deployed --------------------------
   
   jobRunScript(paste0(Script_path,"SaveFieldData.R"),importEnv=T)
 
+  # wait for this to finish before proceeding
 
 # step 3: check data for anomalies ----------------------------------------
 
@@ -79,8 +82,9 @@
   
   SensorData_clean <- CleanDataset(DataErrors,SensorData)
   
-  ID_Errors(site="BFR5",fulldat=SensorData_clean)
+  #ID_Errors(site="BFR5",fulldat=SensorData_clean)
 
+  #CheckSet(SensorData_clean)
 
 # step 4: save cleaned data -----------------------------------------------
 
@@ -90,10 +94,58 @@
   
   write.csv(SensorData_clean,paste0(Out_path,"cleaned_sensordata.csv"),row.names=F)
   
-# step 4: add any new anomalies to 'BadSensorData' file and save ----------
+# step 5: add any new anomalies to BadSensorData.csv, and repeat steps 3 and 4 as needed ----------
 
 
-# step 5: re-run functions from step 3 as needed to ID all errors ----------
+# step 6: check distribution of data to ID water infiltration ----------
+
+  SensorData <- read.csv(paste0(Out_path,"cleaned_sensordata.csv"))
+  mean_surf <- aggregate(vmc_Surf ~ SensorID + SiteID,SensorData,mean,na.rm=T)
+  mean_deep <- aggregate(vmc_Deep ~ SensorID + SiteID,SensorData,mean,na.rm=T)
+
+  SensorData$diff <- SensorData$vmc_Surf - SensorData$vmc_Deep
+
+  mean_diff <- aggregate(diff ~ SensorID + SiteID,SensorData,mean,na.rm=T)  
+
+  full_comp <- merge(mean_surf,mean_deep)  
+  full_comp <- merge(full_comp,mean_diff)  
+  
+  
+  
+  hist(full_comp$vmc_Surf,20)
+  hist(full_comp$vmc_Deep,20)  
+  hist(full_comp$diff,20)  
+  
+  library(ggplot2)
+  library(patchwork)  
+  library(ggrepel)  
 
 
+  
+  surf <- ggplot(full_comp,aes(x=vmc_Surf)) +
+            geom_histogram() +
+            geom_label_repel(aes(label=SensorID,y=1)) +
+            theme_classic()
+  deep <- ggplot(full_comp,aes(x=vmc_Deep)) +
+            geom_histogram() +
+            geom_label_repel(aes(label=SensorID,y=1)) +
+            theme_classic()
+  diff <- ggplot(full_comp,aes(x=diff)) +
+            geom_histogram() +
+            geom_label_repel(aes(label=SensorID,y=1)) +
+            theme_classic()
+
+  surf / deep / diff  
+  
+  
+  outlier_surf <- c("B14")
+  outlier_deep <- c("")  
+
+  
+  no_outliers <- SensorData
+
+  no_outliers$vmc_Surf[no_outliers$SensorID %in% outlier_surf] <- NA  
+  no_outliers$vmc_Deep[no_outliers$SensorID %in% outlier_deep] <- NA  
+
+  write.csv(no_outliers,paste0(Out_path,"no_outliers_data.csv"))  
   

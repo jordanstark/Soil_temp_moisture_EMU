@@ -10,10 +10,10 @@
     library(patchwork)
   
   # paths
-    Metadata_path <- "C:/Users/Jordan/Desktop/Smokies Data/"
+    #Metadata_path <- "C:/Users/Jordan/Desktop/Smokies Data/"
       # this should contain 'Bsensor_BadDataList.csv'
   
-    Out_path <- "C:/Users/Jordan/Desktop/Smokies Data/CleanSoilData/"
+    #Out_path <- "C:/Users/Jordan/Desktop/Smokies Data/CleanSoilData/"
       # this should contain 'field_sensordata.csv'
       # output file 'cleaned_sensordata.csv' will also be saved here
   
