@@ -31,7 +31,7 @@
 
 # step 1: import raw data, apply calibration ------------------------------
 
-  jobRunScript(paste0(Script_path,"ReadBSensors.R"),importEnv=T)
+  #jobRunScript(paste0(Script_path,"ReadBSensors.R"),importEnv=T)
     # note that this currently assumes that surface and 10cm temps are the same
 
 
@@ -39,7 +39,7 @@
   
 # step 2: remove dates when sensors not deployed --------------------------
   
-  jobRunScript(paste0(Script_path,"SaveFieldData.R"),importEnv=T)
+  #jobRunScript(paste0(Script_path,"SaveFieldData.R"),importEnv=T)
 
   # wait for this to finish before proceeding
 
@@ -78,11 +78,13 @@
           # note that for soil temp errors this also removes soil moisture data
             # because temp was used in the calibration
   
-  ID_Errors(site="BFR5",fulldat=SensorData)
+  #ID_Errors(site="BFR3",fulldat=SensorData)
   
   SensorData_clean <- CleanDataset(DataErrors,SensorData)
   
-  #ID_Errors(site="BFR5",fulldat=SensorData_clean)
+  ID_Errors(site="AT2",fulldat=SensorData_clean)
+  
+  ZoomIn("LM7",SensorData,ymd("2020-04-15"),ymd("2020-06-01"))
 
   #CheckSet(SensorData_clean)
 
@@ -100,21 +102,11 @@
 # step 6: check distribution of data to ID water infiltration ----------
 
   SensorData <- read.csv(paste0(Out_path,"cleaned_sensordata.csv"))
-  mean_surf <- aggregate(vmc_Surf ~ SensorID + SiteID,SensorData,mean,na.rm=T)
-  mean_deep <- aggregate(vmc_Deep ~ SensorID + SiteID,SensorData,mean,na.rm=T)
+  q05_surf <- aggregate(vmc_Surf ~ SensorID + SiteID,SensorData,quantile,probs=0.05,na.rm=T)
+  q05_deep <- aggregate(vmc_Deep ~ SensorID + SiteID,SensorData,quantile,probs=0.05,na.rm=T)
 
-  SensorData$diff <- SensorData$vmc_Surf - SensorData$vmc_Deep
+  full_comp <- merge(q05_surf,q05_deep,all=T)  
 
-  mean_diff <- aggregate(diff ~ SensorID + SiteID,SensorData,mean,na.rm=T)  
-
-  full_comp <- merge(mean_surf,mean_deep)  
-  full_comp <- merge(full_comp,mean_diff)  
-  
-  
-  
-  hist(full_comp$vmc_Surf,20)
-  hist(full_comp$vmc_Deep,20)  
-  hist(full_comp$diff,20)  
   
   library(ggplot2)
   library(patchwork)  
@@ -122,23 +114,30 @@
 
 
   
-  surf <- ggplot(full_comp,aes(x=vmc_Surf)) +
-            geom_histogram() +
-            geom_label_repel(aes(label=SensorID,y=1)) +
-            theme_classic()
-  deep <- ggplot(full_comp,aes(x=vmc_Deep)) +
-            geom_histogram() +
-            geom_label_repel(aes(label=SensorID,y=1)) +
-            theme_classic()
-  diff <- ggplot(full_comp,aes(x=diff)) +
-            geom_histogram() +
-            geom_label_repel(aes(label=SensorID,y=1)) +
-            theme_classic()
+  surf <- ggplot(full_comp,aes(x=vmc_Surf,y=0)) +
+            geom_point(alpha=0.4,size=6) +
+            geom_label_repel(aes(label=paste0(SiteID,SensorID)),
+                             max.overlaps=Inf,box.padding=1) +
+            theme_classic() +
+            theme(axis.text.y=element_blank()) + ylab("")
+  deep <- ggplot(full_comp,aes(x=vmc_Deep,y=0)) +
+            geom_point(alpha=0.4,size=6) +
+            geom_label_repel(aes(label=paste0(SiteID,SensorID)),
+                             max.overlaps=Inf,box.padding=1) +
+            theme_classic()+
+            theme(axis.text.y=element_blank()) + ylab("")
+  ratio <- ggplot(full_comp,aes(x=vmc_Surf/vmc_Deep,y=0)) +
+            geom_point(alpha=0.4,size=6) +
+            geom_label_repel(aes(label=paste0(SiteID,SensorID)),
+                             max.overlaps=Inf,box.padding=1) +
+            theme_classic()+
+            theme(axis.text.y=element_blank()) + ylab("")
 
-  surf / deep / diff  
+  
+  surf / deep / ratio
   
   
-  outlier_surf <- c("B14")
+  outlier_surf <- c("B14","B04","B02")
   outlier_deep <- c("")  
 
   
