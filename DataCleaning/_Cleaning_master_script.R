@@ -78,7 +78,7 @@
           # note that for soil temp errors this also removes soil moisture data
             # because temp was used in the calibration
   
-  #ID_Errors(site="BFR3",fulldat=SensorData)
+  ID_Errors(site="AT2",fulldat=SensorData)
   
   SensorData_clean <- CleanDataset(DataErrors,SensorData)
   
