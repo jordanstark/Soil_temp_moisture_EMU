@@ -24,12 +24,18 @@
     SensorData$Remove_Date <- ymd(SensorData$Remove_Date)
     SensorData$Check_Date_1 <- mdy(SensorData$Check_Date_1)
     SensorData$Check_Date_2 <- mdy(SensorData$Check_Date_2)
+  
+  # identify max and min dates for 'na' start/end of errors
+    MaxDay <- max(SensorData$Remove_Date,na.rm=T)
+    MinDay <- min(SensorData$Deploy_Date,na.rm=T)
 
   # import already identified errors
     DataErrors <- read.csv(paste0(Metadata_path,"Bsensor_BadDataList.csv"))
     DataErrors$remove_start <- as_datetime(mdy(DataErrors$remove_start))
     DataErrors$remove_end <- as_datetime(mdy(DataErrors$remove_end))
     
+    DataErrors$remove_start[is.na(DataErrors$remove_start)] <- MinDay
+    DataErrors$remove_end[is.na(DataErrors$remove_end)] <- MaxDay
     
 #### function to plot sensor data and ID problems ####
   
@@ -167,7 +173,7 @@
         annotate(geom="text",label="Ch1",y=Inf,
                  x=as_datetime(checks$Check_Date_2),
                  vjust=1,hjust=1)
-      print(paste0("Ch1: ",checks$Check_Notes_2))
+      print(paste0("Ch2: ",checks$Check_Notes_2))
     }
     
     print(full_plot)
