@@ -11,11 +11,19 @@
 
 
 # paths
-  data_path <-  "C:/Users/Jordan/Desktop/Smokies Data/FieldData/B_sensors/"
+  #data_path <-  "C:/Users/Jordan/Desktop/Smokies Data/FieldData/B_sensors/"
+  #data_path <- "E:/Smokies_Moisture/soil_data/raw/Bsensors/"
+  data_path <- sensordata_path
     # this should contain all raw sensor data (and nothing else)
-  Metadata_path <- "C:/Users/Jordan/Desktop/Smokies Data/"
+  
+  #Metadata_path <- "C:/Users/Jordan/Desktop/Smokies Data/"
+  #Metadata_path <-  "E:/Smokies_Moisture/soil_data/raw/"
+  Metadata_path <- sensormetadata_path
     # this should contain calib_coefs.csv
-  Out_path <- "C:/Users/Jordan/Desktop/Smokies Data/CleanSoilData/"
+  
+  #Out_path <- "C:/Users/Jordan/Desktop/Smokies Data/CleanSoilData/"
+  #Out_path <-  "E:/Smokies_Moisture/soil_data/"
+  Out_path <- intermediate_path
     # location to save outputs
 
 
