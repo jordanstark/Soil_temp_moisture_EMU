@@ -90,10 +90,7 @@
 
 # step 4: save cleaned data -----------------------------------------------
 
-  # check that all sensors still have data (this can be a problem if there are types in metadata)
-  stopifnot(length(unique(SensorData_clean$SensorID)) == length(list.files(data_path)))
-  
-  
+
   write.csv(SensorData_clean,paste0(Out_path,"cleaned_sensordata.csv"),row.names=F)
   
 # step 5: add any new anomalies to BadSensorData.csv, and repeat steps 3 and 4 as needed ----------
