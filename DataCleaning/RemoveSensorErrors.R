@@ -32,6 +32,15 @@
     DataErrors$remove_end <- as_datetime(mdy(DataErrors$remove_end))
     
     
+  # identify max and min dates for 'na' start/end of errors
+    MaxDay <- max(SensorData$Remove_Date,na.rm=T)
+    MinDay <- min(SensorData$Deploy_Date,na.rm=T)
+    
+    
+    DataErrors$remove_start[is.na(DataErrors$remove_start)] <- MinDay
+    DataErrors$remove_end[is.na(DataErrors$remove_end)] <- MaxDay
+    
+    
 #### remove identified errors #### 
 
   # function to remove identified errors from data
@@ -64,4 +73,22 @@
  
     Clean_data <- CleanDataset(DataErrors,SensorData)
     
+    
+  # add warnings for other potential errors
+    Clean_data$warning <- NA
+    
+    Clean_data$warning[Clean_data$SiteID=="PK1"] <- "not under canopy" 
+    Clean_data$warning[Clean_data$SiteID=="GM8"] <- "very high vmcs"
+    Clean_data$warning[Clean_data$SiteID=="R4"] <- "low variation in vmcs"
+    Clean_data$warning[Clean_data$SiteID=="ATC3"] <- "very high vmcd"
+    Clean_data$warning[Clean_data$SiteID=="ATC4.5"] <- "low vmcs"
+    Clean_data$warning[Clean_data$SiteID=="ATE02"] <- "odd dips in vmc"
+    Clean_data$warning[Clean_data$SiteID=="PK04a"] <- "st was 10 cm deep"
+    Clean_data$warning[Clean_data$SiteID=="PK04b"] <- "st and vmcs were 10 cm deep"
+    Clean_data$warning[Clean_data$SiteID=="SD6"] <- "vmcd very high, possibly need to remove starting June 2020"
+    
+  # remove sensors where warnings are a problem
+    if(length(remove_list) > 0) Clean_data <- Clean_data[-which(Clean_data$SiteID %in% remove_list),]
+    
+  # save data
     write.csv(Clean_data,paste0(Out_path,"cleaned_sensordata.csv"),row.names=F)
