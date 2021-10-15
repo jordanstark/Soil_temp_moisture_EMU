@@ -10,11 +10,11 @@
 
   # paths
     #Metadata_path <- "C:/Users/Jordan/Desktop/Smokies Data/"
-    Metadata_path <- sensormetadata_path
+    #Metadata_path <- sensormetadata_path
       # this should contain SensorLocationHistory.csv
     
     #Out_path <- "C:/Users/Jordan/Desktop/Smokies Data/CleanSoilData/"
-    Out_path <- intermediate_path
+    #Out_path <- intermediate_path
       # this should contain 'sensordata.csv'
       # output file 'field_sensordata.csv' will also be saved here
     
