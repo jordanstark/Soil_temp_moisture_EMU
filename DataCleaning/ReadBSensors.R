@@ -96,6 +96,7 @@
     }
     
     clean_dat <- do.call(rbind,processed)
+    clean_dat <- unique(clean_dat) #remove duplicates from sensors that were downloaded twice
   
   # import and set function for calibration
   c_mod <- read.csv(paste(Metadata_path,"calib_coefs.csv",sep=""),row.names=1)
